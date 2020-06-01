@@ -1,0 +1,19 @@
+Generate all possible 6 digit combinations in Python
+
+#!/usr/bin/python
+import itertools
+
+for combination in itertools.product(range(10), repeat=6):
+    print(''.join(map(str, combination)))
+
+-----------------
+
+./all6digits.py > outfile.dic
+
+Make Random
+
+cat outfile.dic | sort --random-sort > 6digits.dic
+
+wc -l 6digits.dic
+1000000 6digits.dic
+

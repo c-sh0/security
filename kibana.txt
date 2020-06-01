@@ -1,0 +1,10 @@
+Get version
+-----------------------------------------------
+
+    curl -sk https://<host>/path | grep 'kbn-version'
+
+	...
+          xhr.setRequestHeader('kbn-version', '6.6.1')
+          xhr.setRequestHeader('kbn-version', '6.6.1')
+	...
+

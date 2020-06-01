@@ -1,0 +1,22 @@
+Parse Grep'able (-oG) output
+--------------------------------------------------------
+
+	grep 'Ports:' <file> | sed -e 's/,/\n/g' -e 's/Ports:/\n/g' -e 's/\// /g' -e 's/ tcp //g' -e 's/Ignored State:.*/\n/g'
+
+	# Parse nmap Grep'able log file
+	# . ~/.bashrc
+	# [host]:>  pnmap {filename}
+	pnmap() {
+        	grep 'Ports:' $1 | sed -e 's/,/\n/g' \
+                	-e 's/Ports:/\n/g' \
+                	-e 's/\// /g' \
+                	-e 's/Ignored State:.*/\n/g' | grep -v 'filtered\|closed'
+	}
+
+
+Check SSL cipher's. This script repeatedly initiates SSLv3/TLS connections, each time trying a new cipher or compressor while
+recording whether a host accepts or rejects it. The end result is a list of all the ciphersuites and compressors that a server accepts.
+--------------------------------------------------------
+
+	nmap -sV  -p <port> --script=ssl-enum-ciphers <host>
+

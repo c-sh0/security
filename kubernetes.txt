@@ -1,0 +1,52 @@
+Ports:
+-----------------------------------------------------------------------
+Master node(s):
+TCP     6443*       Kubernetes API Server (or 8080 if TLS is disabled)
+TCP     2379-2380   etcd server client API
+TCP     10250       Kubelet API
+TCP     10251       kube-scheduler
+TCP     10252       kube-controller-manager
+TCP     10255       Read-Only Kubelet API
+TCP	10257	    kube-controller-manager (ssl)
+TCP	10259       kube-scheduler (ssl)
+
+Worker nodes (minions):
+TCP     10250       Kubelet API
+TCP     10255       Read-Only Kubelet API
+TCP     30000-32767 NodePort Services
+
+For weave:
+TCP/UDP 6783/6784
+
+Scanner
+-----------------------------------------------------------------------
+kube-hunter: https://github.com/aquasecurity/kube-hunter
+
+	# curl  -k https://host:10250/pods
+	Forbidden (user=system:anonymous, verb=get, resource=nodes, subresource=proxy)
+
+	^^^^ Kubelet uses RBAC for authorization and it’s telling you that the default anonymous
+	system account is not allowed to connect.
+
+	Impersonate the API server kubelet client to contact the secure port:
+	https://sysdig.com/blog/kubernetes-security-kubelet-etcd
+
+	# curl -k https://host:10250/pods --cacert /etc/kubernetes/pki/ca.crt \
+		--key /etc/kubernetes/pki/apiserver-kubelet-client.key \
+		--cert /etc/kubernetes/pki/apiserver-kubelet-client.crt | jq .
+
+-----------------------------------------------------------------------
+RCE Tool: https://github.com/serain/kubelet-anon-rce
+ - Execute commands in a container on a kubelet endpoint that allows anonymous authentication (default)
+
+	There is a /exec endpoint which allows running a command in a target container and returns a link to fetch the output.
+	That link is a stream that should be read with a WebSocket.
+
+	You can get a list of pods/containers running on the node from the /pods endpoint
+	and to confirm anonymous authentication:
+
+	$ curl https://host:10250/pods
+
+Good reads:
+https://github.com/hardening-kubernetes/from-scratch
+

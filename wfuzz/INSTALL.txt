@@ -1,0 +1,76 @@
+--------------------------------------------------------------------
+Wfuzz - The Web Fuzzer -  https://github.com/xmendez/wfuzz
+--------------------------------------------------------------------
+When running wfuzz you might see the following.
+ERRORS:
+	Warning: Pycurl is not compiled against Openssl. Wfuzz might not work correctly when fuzzing SSL sites. Check Wfuzz's documentation for more information.
+	Warning: Pycurl and/or libcurl version is old. CONNECT_TO option is missing. Wfuzz --ip option will not be available.
+	Warning: Pycurl and/or libcurl version is old. PATH_AS_IS option is missing. Wfuzz might not correctly fuzz URLS with '..'.
+
+Install notes for CentOS
+
+* Probably not the best way to install this tool but, i found it was less painfull than other suggested fixes
+* Requires a version of libcurl (pycurl) w/ openssl backend.
+* WARNING: yum uses libcurl and may break. It can be a pita to fix.
+
+--------------------------------------------------------------------
+Curl upgrade/install from source (i needed http2 support anyway):
+--------------------------------------------------------------------
+* WARNING: This will replace curl that has been installed by the base os (bad mojo! ;-P)
+	   Keep this in mind if you update the base OS after this install.
+
+	yum install libnghttp2-devel libnghttp2 nghttp2 httpd24-libnghttp2-devel httpd24-nghttp2 libtool m4 libev-devel
+
+	git clone https://github.com/curl/curl.git
+	cd curl
+	git checkout curl-7_68_0
+	./buildconf
+
+	./configure --prefix=/usr --without-nss --enable-openssl-auto-load-config --with-nghttp2 --disable-file --with-libssh2 \
+		--enable-file --enable-cookies --enable-http-auth --enable-unix-sockets --enable-ftp --enable-proxy --enable-telnet \
+		--enable-tftp --enable-smtp --enable-gopher --enable-ipv6 --enable-verbose --enable-mime --enable-dnsshuffle
+
+	make && make install
+
+	ldconfig
+
+	# curl-config --ssl-backends
+	OpenSSL
+
+* Make sure yum still works
+	# yum search something
+
+--------------------------------------------------------------------
+Wfuzz install from source
+--------------------------------------------------------------------
+* Documentation suggests python3 works best
+
+	# cat ~/.bashrc
+	alias python='/usr/bin/python3.6'
+	alias pip='/usr/bin/pip3.6'
+	. ~/.bashrc
+
+	# python --version
+	Python 3.6.8
+
+	pip install setuptools
+	pip install shodan
+
+	git clone https://github.com/xmendez/wfuzz.git
+	cd wfuzz
+	export PYCURL_SSL_LIBRARY=openssl
+	python setup.py install
+
+
+--------------------------------------------------------------------
+Wfuzz 2.4.5 Usage Samples
+--------------------------------------------------------------------
+
+* Discover directories, Ignore 404 not found:
+
+	wfuzz -c -w /path/to/dirlist.txt --hc 404 https://127.0.0.1/FUZZ/
+
+* Discover files (file-names.txt) with extensions (file-extensions.txt), Ignore 404 not found:
+
+	wfuzz -c -w /path/to/file-names.txt -z file,/path/to/file-extensions.txt --hc 404 https://127.0.0.1/FUZZ.FUZ2Z
+

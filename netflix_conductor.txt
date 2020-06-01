@@ -1,0 +1,7 @@
+https://netflix.github.io/conductor/
+
+Get version:
+----------------------------------------------
+
+	curl -sk https://<host>/api/sys | jq '.sys.version'
+

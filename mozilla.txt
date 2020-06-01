@@ -1,0 +1,7 @@
+Change User-Agent
+--------------------------------------------------------
+* Usfull for testing web applications that parse UA headers
+
+	about:config
+	Add general.useragent.override <string>
+

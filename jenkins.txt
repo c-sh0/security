@@ -1,0 +1,39 @@
+Get Version:
+----------------------------------------------------------
+	To check the version of Jenkins, load the top page (or, as of 1.483, any .../api/* page too) and
+	check for the X-Jenkins response header. This contains the version number of Jenkins, like "1.404" This
+	is also a good way to check if an URL is a Jenkins URL.
+
+		curl -sD /dev/stdout http://<host>/api/json | grep "X-Jenkins:\|X-Hudson:"
+
+	CSRF Protection
+	https://wiki.jenkins.io/display/JENKINS/Remote+access+API
+	Note: From Jenkins 2.96 onward, you can use an API token and avoid using a crumb / CSRF token.
+
+	If your Jenkins uses the "Prevent Cross Site Request Forgery exploits" security option (which it should), when you
+	make a POST request, you have to send a CSRF protection token as an HTTP request header.
+	For curl/wget you can obtain the header needed in the request from the URL JENKINS_URL/crumbIssuer/api/xml (or .../api/json).
+	Something like this:
+
+	wget -q --auth-no-challenge --user USERNAME --password PASSWORD --output-document - \
+		'JENKINS_URL/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,":",//crumb)'
+
+	This will print something like "Jenkins-Crumb:1234abcd", which you should add to the subsequent request.
+
+----------------------------------------------------------
+
+Jenkins listens on UDP port 33848. You can either send an UDP broadcast packet (targeted to 255.255.255.255) to this port, or you can send an
+UDP multicast packet (targeted to 239.77.124.213) to this port. When a packet is received (the payload doesn't matter), Jenkins will send an XML
+response to the sending UDP port as a datagram.
+
+	https://wiki.jenkins.io/display/JENKINS/Auto-discovering+Jenkins+on+the+network
+
+	* Send packet with Nmap - broadcast-jenkins-discover.nse
+
+		nmap --script=broadcast-jenkins-discover --script-args=timeout=15s
+
+Get a list of Installed plugins/versions:
+----------------------------------------------------------
+
+	curl -k 'https://<host>/pluginManager/api/json?depth=1' | jq -r '.plugins[] | "\(.shortName):\(.version)"'
+

@@ -1,0 +1,6 @@
+# ~/.bashrc
+# Team Cymru IP to ASN Lookup
+awhois() {
+        whois -h whois.cymru.com "-v $1"
+}
+

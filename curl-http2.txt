@@ -1,0 +1,52 @@
+------------------------------------------------------
+CentOS install notes:
+As of this writing, the base version of curl does not include http2 support 
+------------------------------------------------------
+
+--------------------------------------------------------------------------
+		!!!! WARNING !!!
+--------------------------------------------------------------------------
+https://wiki.centos.org/AdditionalResources/Repositories
+
+	City-Fan - Supplies repos for various CentOS/RHEL versions and all appear to have no regard for overwriting packages from base/updates
+	without warning. Enabled by default, contains lots of packages that overwrite base packages. That includes various system libraries
+	including libcurl and will break yum as soon as it's installed! Do not use.
+
+	Be particularly careful about the City-Fan repo as they enable their repo by default when installed. City-Fan will replace
+	many core packages as configured when installed and those packages often have a different structure than the CentOS ones
+	making them difficult if not impossible to remove cleanly. Even removing packages installed from this repository may leave
+	the system in an unusable state. You've been warned.
+
+--------------------------------------------------------------------------
+Quick install from city-fan.org repo:
+--------------------------------------------------------------------------
+
+	rpm -Uvh http://www.city-fan.org/ftp/contrib/yum-repo/rhel7/x86_64/city-fan.org-release-2-1.rhel7.noarch.rpm
+	yum --enablerepo=city-fan.org install libcurl libcurl-devel
+
+* Remove city-fan.org repo after install:
+
+	yum remove city-fan.org-release-2-1.rhel6.noarch
+	yum clean all
+
+	# curl-config --ssl-backends
+	NSS
+
+--------------------------------------------------------------------------
+Install from source (into /opt/curl)
+--------------------------------------------------------------------------
+
+	yum install libnghttp2-devel libnghttp2 nghttp2 httpd24-libnghttp2-devel httpd24-nghttp2 libtool m4 libev-devel
+
+	git clone https://github.com/curl/curl.git
+	cd curl
+	git checkout curl-7_68_0
+	./buildconf
+	./configure --prefix=/opt/curl --without-nss --enable-openssl-auto-load-config --with-nghttp2 --disable-file --with-libssh2 \
+                --enable-file --enable-cookies --enable-http-auth --enable-unix-sockets --enable-ftp --enable-proxy --enable-telnet \
+                --enable-tftp --enable-smtp --enable-gopher --enable-ipv6 --enable-verbose --enable-mime --enable-dnsshuffle
+
+	make && make install
+
+        # /opt/curl/bin/curl-config --ssl-backends
+        OpenSSL

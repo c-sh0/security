@@ -1,0 +1,5 @@
+Get version (swagger ui)
+---------------------------------------
+
+	curl -v http://<host>:<port>/path/to/swagger-ui.js
+

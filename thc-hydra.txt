@@ -1,0 +1,39 @@
+CentOS:
+----------------------------------------------
+
+git clone https://github.com/vanhauser-thc/thc-hydra.git
+
+Install common libs:
+
+yum install \
+	libssh-devel \
+	mariadb-devel \
+	libmemcached-devel memcached-devel \
+	libsmbclient-devel \
+	postgresql-devel \
+	subversion-devel \
+	firebird-devel \
+	libidn-devel \
+	freerdp-devel
+
+--disable-xhydra           disable compilation of hydra GUI
+
+./configure --disable-xhydra
+
+make && make install
+...
+strip hydra pw-inspector
+echo OK > /dev/null && test -x xhydra && strip xhydra || echo OK > /dev/null
+mkdir -p /usr/local/bin
+cp -f hydra-wizard.sh hydra pw-inspector /usr/local/bin && cd /usr/local/bin && chmod 755 hydra-wizard.sh hydra pw-inspector
+echo OK > /dev/null && test -x xhydra && cp xhydra /usr/local/bin && cd /usr/local/bin && chmod 755 xhydra || echo OK > /dev/null
+sed -e "s|^INSTALLDIR=.*|INSTALLDIR="/usr/local"|" dpl4hydra.sh | sed -e "s|^LOCATION=.*|LOCATION="/etc"|" > /usr/local/bin/dpl4hydra.sh
+chmod 755 /usr/local/bin/dpl4hydra.sh
+mkdir -p /usr/local/etc
+cp -f *.csv /usr/local/etc
+mkdir -p /usr/local/man/man1/
+cp -f hydra.1 xhydra.1 pw-inspector.1 /usr/local/man/man1/
+
+# hydra -h
+Hydra v9.1-dev (c) 2020 by van Hauser/THC & David Maciejak
+

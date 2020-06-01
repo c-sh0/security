@@ -1,0 +1,13 @@
+For when you need to bypass Chrome HTTP Strict Transport Security because the
+"proceed unsafe" link is not there, https://www.chromium.org/hsts
+
+Click anywhere in chrome window and type thisisunsafe (instead of badidea previously) in chrome.
+
+This passphrase may change in future. This is the source
+https://chromium.googlesource.com/chromium/src/+/master/components/security_interstitials/core/browser/resources/interstitial_large.js#19
+
+According to that line, type window.atob('dGhpc2lzdW5zYWZl') to your browser devtools console and
+it will give you the actual passphrase.
+
+This time the passphrase is "thisisunsafe"
+

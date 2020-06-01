@@ -1,0 +1,37 @@
+Install Notes:
+---------------------------------------------
+
+ gpg --keyserver hkp://pool.sks-keyservers.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB
+ curl -sSL https://get.rvm.io | bash -s stable --ruby
+
+ source /usr/local/rvm/scripts/rvm
+ ruby --version
+ ruby 2.7.0p0 (2019-12-25 revision 647ee6f091) [x86_64-linux]
+
+ rvm reload
+ rvm requirements run
+
+     |__ ls /etc/profile.d/rvm.sh
+
+ gem --version
+ 3.1.2
+
+ gem install wpscan
+
+# wpscan --version
+_______________________________________________________________
+         __          _______   _____
+         \ \        / /  __ \ / ____|
+          \ \  /\  / /| |__) | (___   ___  __ _ _ __ ®
+           \ \/  \/ / |  ___/ \___ \ / __|/ _` | '_ \
+            \  /\  /  | |     ____) | (__| (_| | | | |
+             \/  \/   |_|    |_____/ \___|\__,_|_| |_|
+
+         WordPress Security Scanner by the WPScan Team
+                         Version 3.8.0
+       Sponsored by Automattic - https://automattic.com/
+       @_WPScan_, @ethicalhack3r, @erwan_lr, @firefart
+_______________________________________________________________
+
+Run:
+	wpscan --detection-mode mixed --ignore-main-redirect --disable-tls-checks --api-token <VulnDB Token> --url https://server/

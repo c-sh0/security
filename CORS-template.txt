@@ -1,0 +1,26 @@
+<html>
+     <body>
+         <h2>CORS Demo</h2>
+         <div id="demo">
+             <button type="button" onclick="cors()">Test CORS</button>
+         </div>
+         <script>
+             function cors() {
+
+             var xhr = new XMLHttpRequest();
+             xhr.onreadystatechange = function() {
+                 if (this.readyState == 4 && this.status == 200) {
+                 	document.getElementById("demo").innerHTML = alert(this.responseText);
+                 }
+             };
+
+              xhr.open("GET",
+                       "https://host/path/to/something/",
+			true);
+
+               xhr.withCredentials = true;
+               xhr.send();
+             }
+         </script>
+     </body>
+ </html>

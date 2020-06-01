@@ -1,0 +1,28 @@
+Query/Schema tools:
+----------------------------
+https://github.com/doyensec/graph-ql
+https://github.com/szski/shapeshifter
+
+https://github.com/timqian/gql-generator
+https://github.com/prisma-labs/get-graphql-schema
+
+https://github.com/opentable/graphql-query-generator
+
+
+---
+Install nodejs software collection
+https://www.softwarecollections.org/en/scls/rhscl/rh-nodejs8/
+
+scl enable rh-nodejs8 bash
+
+npm install -g gql-generator
+npm install -g get-graphql-schema
+
+Grab schema File (introspection must be enabled, add auth header if required):
+
+	get-graphql-schema  --header 'Authorization=Bearer ...' http://host/graphql > schema.graphql
+
+Parse schema (generate query's):
+
+	gqlg --schemaFilePath ./schema.graphql --destDirPath ./parsed_dir
+

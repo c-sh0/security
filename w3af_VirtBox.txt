@@ -1,0 +1,79 @@
+#
+# w3af is a Web Application Attack and Audit Framework. The project’s goal is to create a
+# framework to help you secure your web applications by finding and exploiting all web application vulnerabilities.
+# http://w3af.org/
+#
+Virtbox (w/ GUI) Install:
+---------------------------------
+
+yum update && yum upgrade
+systemctl stop chronyd && systemctl disable chronyd
+systemctl stop rpcbind && systemctl disable rpcbind
+systemctl stop rpcbind.socket && systemctl disable rpcbind.socket
+systemctl stop postfix && systemctl disable postfix
+
+rpm --import https://www.elrepo.org/RPM-GPG-KEY-elrepo.org
+yum install https://www.elrepo.org/elrepo-release-7.0-4.el7.elrepo.noarch.rpm
+yum install yum-plugin-fastestmirror
+yum install epel-release
+yum install --enablerepo=elrepo-kernel kernel-ml
+yum install --enablerepo=elrepo-kernel kernel-ml-headers
+
+awk -F\' '$1=="menuentry " {print i++ " : " $2}' /boot/grub2/grub.cfg
+grub2-set-default '.. full kernel name ...'
+
+rm -rf /boot/*rescue*
+grub2-mkconfig -o /boot/grub2/grub.cfg
+reboot
+
+yum install htop git vim lsof net-tools python3-pip python-pip pygtk2 graphviz npm gcc gcc-c++ python-devel openssl-devel
+yum install libxml2-devel libxml++-devel libxslt-devel pywebkitgtk webkitgtk pygtksourceview bind-utils whois wget curl jq
+
+pip install --upgrade pip
+pip install setuptools
+pip install setuptools --upgrade
+
+echo '/usr/lib64/gnucash' > /etc/ld.so.conf.d/gnucash-x86_64.conf && ldconfig
+
+
+git clone --depth 1 https://github.com/andresriancho/w3af.git
+cd w3af/
+
+# export X11 display
+export DISPLAY=<your host ip>:0.0
+
+
+
+./w3af_gui
+
+[.... follow any npm install instructions ... ]
+
+/tmp/w3af_dependency_install.sh
+
+[... fix things that may be broke here ....]
+
+
+# all good! run it.
+./w3af_gui
+
+
+=====================
+profiles
+use api_scan
+back
+
+plugins
+output console
+output
+back
+
+target
+set target https://<host>/
+back
+
+
+start
+
+
+
+
