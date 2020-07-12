@@ -3,7 +3,7 @@ Collection of some common and not so common reverse shell, file upload, and down
 
 NOTES:
 * Having disk write permissions on the client is +1
-*  If SELinux is enabled on the client system, alot of these may not work as intended. Disable SElinux:
+*  If SELinux is enabled on the client system, alot of these may not work as intended. Disable SELinux:
      
      ```[root@client]# setenforce 0```
 
