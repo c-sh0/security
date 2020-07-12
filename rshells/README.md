@@ -9,6 +9,6 @@ NOTES:
      ```[root@client]# setenforce 0```
 
 References:<br>
-https://gtfobins.github.io/<br>
 https://github.com/swisskyrepo/PayloadsAllTheThings<br>
+https://gtfobins.github.io/<br>
 https://oshi.at/cmd<br>
