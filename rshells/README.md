@@ -1,5 +1,5 @@
 # Reverse Shells and Other tricks
-Collection of some common and not so common reverse shell, file upload, and download tircks without the use of standard tools.
+Collection of some common and not so common reverse shell, file upload, and download tircks using non-statndard tools.
 
 NOTES:
 * Having disk write permissions on the client is +1
