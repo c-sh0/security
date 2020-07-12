@@ -10,4 +10,4 @@ NOTES:
 References:<br>
 https://gtfobins.github.io/<br>
 https://github.com/swisskyrepo/PayloadsAllTheThings<br>
-
+https://oshi.at/cmd<br>
