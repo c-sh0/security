@@ -13902,6 +13902,7 @@ tmp/xd.php
 tmui/tmui/login/welcome.jsp
 tmui/login/welcome.jsp
 tmui/login.jsp
+tmui/login.jsp/..;/tmui/system/user/authproperties.jsp
 TMultiView
 tmx
 tn
