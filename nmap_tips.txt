@@ -31,3 +31,27 @@ Get a shell
         echo "os.execute('/bin/sh')" > /tmp/shell.nse
         nmap --script=/tmp/shell.nse
 
+------------------------
+alias netscan='_netscan() { nmap -v -T5 -sn $1 | grep -v "host down" | grep -w "scan report" ;}; _netscan'
+
+## Fast Nmap
+alias ports='_p() { nmap -p- --min-rate=20000 -T4 $1 | grep ^[0-9] | cut -d "/" -f 1 | tr "\n" "," | sed s/,$// ;}; _p' #Credit to @0verflowme
+alias fastnmap='_fn() { nmap -sC -sV -p $(ports $1) $1 | tee nmap.txt ;}; _fn'
+
+----
+
+Nmap 7.40 and newer have a super-fast UDP scan mode that gives similar results to masscan/unicornscan and other asynchronous scanners: nmap -sU --defeat-icmp-ratelimit
+ * coupling this with --randomize-hosts might be a good idea, for large-scale / multi-site use cases
+
+   - Caveat 1: only ports that return a UDP response are considered open, so anything that standard Nmap finds to be "open|filtered" will be
+     "closed|filtered" instead. You *will* miss open ports, but probably not most standard ones.
+
+   - Caveat 2: ICMP Port Unreachable (closed) responses are the primary source of timing info for Nmap's UDP scan, and --defeat-icmp-ratelimit
+     just ignores them. Your scan may end up going *too* fast and not notice dropped responses until it's missed something. Try --max-rate
+
+   - Caveat 3: Because of the previous point, skipping host discovery with -Pn takes away one of the few sources of timing/latency info
+     left to Nmap. Don't do it. Seriously, -Pn is the single most overused and potentially harmful option, and you should feel bad whenever
+     you use it.
+
+
+
