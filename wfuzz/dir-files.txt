@@ -1605,7 +1605,8 @@ api/apidocs
 api/api-docs
 api/authenticate
 api/batch
-apibuild.pyc
+api/build.pyc
+api/build
 api/config
 api/config/bulkedit
 api/config/diff
@@ -1649,8 +1650,12 @@ api/put
 api/quiet
 api/reload
 api/rule
+api/repositories
 apis
 apis/
+api/search/artifact?name=a
+api/search/archive?name=*abc*
+api/security/encryptedPassword
 api/save_enabled
 api/silence/clear
 api/silence/get
@@ -1665,6 +1670,8 @@ api/swagger-ui.html
 api/swagger-ui.html
 api/swagger-ui.json
 api/swagger.yml
+api/system/configuration
+api/system/version
 api/user
 api/users
 api/users/1
@@ -4712,6 +4719,8 @@ doc/en/changes.html
 doc-files
 doc.go
 doc-html/
+docker/v2/token
+docker/v1/token
 docker/
 docker-compose-dev.yml
 docker-compose.yml
