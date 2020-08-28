@@ -4096,6 +4096,10 @@ Daemon
 DAL
 dam.php
 danish
+dana-admin/
+dana-admin/license/downloadlicenses.cgi
+dana-na/
+dana-na/auth/setcookie.cgi
 dao
 darcs-ignore
 dark
