@@ -63,6 +63,17 @@ Wfuzz install from source
 
 
 --------------------------------------------------------------------
+Fatal exception: double urlencode encoder does not exists
+--------------------------------------------------------------------
+Fix, Edit: wfuzz/plugins/encoders/encoders.py
+
+from:
+  name = "double urlencode"
+to:
+  name = "double_urlencode"
+
+
+--------------------------------------------------------------------
 Wfuzz 2.4.5 Usage Samples
 --------------------------------------------------------------------
 
@@ -73,4 +84,5 @@ Wfuzz 2.4.5 Usage Samples
 * Discover files (file-names.txt) with extensions (file-extensions.txt), Ignore 404 not found:
 
 	wfuzz -c -w /path/to/file-names.txt -z file,/path/to/file-extensions.txt --hc 404 https://127.0.0.1/FUZZ.FUZ2Z
+
 
