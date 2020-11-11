@@ -1,0 +1,42 @@
+Tcpreplay - Pcap editing and replaying utilities
+---------------------------------------------------------
+https://github.com/appneta/tcpreplay
+
+Tcpreplay is a suite of GPLv3 licensed utilities for UNIX (and Win32 under Cygwin) operating systems for editing
+and replaying network traffic which was previously captured by tools like tcpdump and Wireshark. It allows you
+to classify traffic as client or server, rewrite Layer 2, 3 and 4 packets and finally replay the traffic back
+onto the network and through other devices such as switches, routers, firewalls, NIDS and IPS's. Tcpreplay supports
+both single and dual NIC modes for testing both sniffing and in-line devices.
+
+
+Install (on CentOS)
+-----------------
+yum --enablerepo=extras install epel-release
+yum install tcpreplay
+
+Modifying PCAPS
+-----------------
+	* Change MAC Addresses
+
+		tcprewrite --enet-smac=xx:xx:xx:xx:xx:xx --enet-dmac=xx:xx:xx:xx:xx:xx --infile=capture.pcap --outfile=capture-new-macs.pcap
+
+	* Change IP Addresses
+	  -: create a input.cache file
+
+		tcpprep --auto=server --pcap=capture.pcap --cachefile=input.cache
+
+	  -: Change IP source and destination
+	        + xxx.xxx.xxx.1 (src addr)
+		+ xxx.xxx.xxx.2 (dst addr)
+
+		tcprewrite --endpoints=xxx.xxx.xxx.2:xxx.xxx.xxx.1 --cachefile=input.cache --infile=capture.pcap --outfile=capture-new-ips.pcap
+
+	  -: Fix checksum's
+
+		tcprewrite --fixcsum --infile=capture-new-ips.pcap --outfile=capture-new-ips-fixed-cksum.pcap
+
+Replaying Packets
+-------------------
+
+	tcpreplay -i <interface> my-sample.pcap
+
