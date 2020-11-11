@@ -1,0 +1,68 @@
+SSLsplit - transparent SSL/TLS interception
+-----------------------------------------------------
+https://github.com/droe/sslsplit
+
+SSLsplit is a tool for man-in-the-middle attacks against SSL/TLS encrypted network connections. It is intended to be useful
+for network forensics, application security analysis and penetration testing.
+
+How to Create a Transparent SSL Forward Proxy using SSLsplit on
+CentOS 7.x to Capture/Sniff SSL packets
+* https://web.archive.org/web/20181014222051/http://www.richardyau.com/?p=300
+
+Scenario
+-------------------
+We are trying to do a packet capture of network traffic from a server, but cannot capture SSL/TLS traffic because it is
+encrypted. This tutorial is to show how to install SSLsplit as a Transparent SSL Forward Proxy to capture encrypted traffic,
+essentially creating a man-in-the-middle for troubleshooting/debugging. Keep in mind that this method of debugging doesn’t
+work on all sites but can be a useful tool on your networking tool belt.
+
+
+Install SSLsplit
+-------------------
+yum install epel-release
+yum install sslsplit
+
+
+Generate SSLSplit Root CA Certificate
+--------------------------------------
+mkdir ~/sslsplit-keys
+openssl genrsa -out ~/sslsplit-keys/ca.key 4096
+openssl req -new -x509 -days 365 -key ~/sslsplit-keys/ca.key -out ~/sslsplit-keys/ca.crt
+
+
+Enable IP Forwarding
+----------------------
+sysctl -w net.ipv4.ip_forward=1
+
+
+Enable HTTP and HTTPS IPTable routes
+(forward local webserver traffic to different ports)
+-----------------------------------------------------
+systemctl start iptables
+iptables -t nat -F
+iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-ports 8080
+iptables -t nat -A PREROUTING -p tcp --dport 443 -j REDIRECT --to-ports 8443
+iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 80 -j ACCEPT
+iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 443 -j ACCEPT
+iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 8443 -j ACCEPT
+iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 8080 -j ACCEPT
+
+
+Start SSLsplit
+--------------------
+* Attributes
+  -D = Debug Mode
+  -l = Logfile
+  -S = Log dir (Decrypted request logs)
+  -k = Private Key
+  -c = CA Certificate
+
+sslsplit -D -l connections.log -S ~/sslsplit-logs/ -k ~/sslsplit-keys/ca.key -c ~/sslsplit-keys/ca.crt ssl 0.0.0.0 8443 tcp 0.0.0.0 8080
+
+
+Tests from the Client
+-----------------------
+curl -vk https://sslstrip.host/
+openssl s_client -connect sslstrip.host:443
+
+
