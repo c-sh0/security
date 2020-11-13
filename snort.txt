@@ -1,0 +1,97 @@
+Snort: https://www.snort.org/
+-----------------------------------------------------
+Snort is the foremost Open Source Intrusion Prevention System (IPS) in the world. Snort IPS uses a series of
+rules that help define malicious network activity and uses those rules to find packets that match against them
+and generates alerts for users. Snort can be deployed inline to stop these packets, as well.
+
+Scenario
+-------------------
+Static PCAP Analysis. Identify an attack by Analyzing packet captures with snort
+
+
+Install (CentOS)
+-------------------
+
+	yum install -y wget gcc flex bison zlib libpcap pcre libdnet tcpdump epel-release
+	yum install -y daq (should be in epel repo)
+
+	wget https://www.snort.org/downloads/snort/snort-2.9.16.1-1.centos7.x86_64.rpm
+	yum localinstall snort-2.9.16.1-1.centos8.x86_64.rpm
+
+	snort --version
+
+   *: You may see this Error
+	snort: error while loading shared libraries: libdnet.1: cannot open shared object file: No such file or directory
+
+	Fix:
+	ln -s /usr/lib64/libdnet.so.1.0.1 /usr/lib64/libdnet.1
+
+Basic Configuration
+-------------------
+  By default, Snort on CentOS expects to find a number of different rule files which are not included in the community rules.
+  Comment out the unnecessary lines using the next command.
+
+	cp /etc/snort/snort.conf /etc/snort/snort.conf.orig
+	sed -i 's/include \$RULE\_PATH/#include \$RULE\_PATH/' /etc/snort/snort.conf
+
+  Fix preprocessor rule path's
+
+	sed -i 's/var WHITE_LIST_PATH ..\/rules/var WHITE_LIST_PATH .\/rules/' /etc/snort/snort.conf
+	sed -i 's/var BLACK_LIST_PATH ..\/rules/var BLACK_LIST_PATH .\/rules/' /etc/snort/snort.conf
+
+	touch /etc/snort/rules/white_list.rules
+	touch /etc/snort/rules/black_list.rules
+
+  Create missing path to dynamic rules libraries
+
+	mkdir /usr/local/lib/snort_dynamicrules
+
+
+  Edit snort.conf, Scroll down to the section 6 and set the output for unified2 to
+  log under filename of snort.log like below.
+
+	# unified2
+	# Recommended for most installs
+	output unified2: filename snort.log, limit 128
+
+  Validate default settings:
+
+	snort -T -c /etc/snort/snort.conf
+
+Rules Configuration
+-----------------------
+  Enable custom site rules in /etc/snort/snort.conf
+
+	# site specific rules
+	include $RULE_PATH/local.rules
+
+	touch /etc/snort/rules/local.rules
+
+
+  Registered user rules:
+       Login/Create an account: https://www.snort.org/users/sign_in
+       Latest snapshots are under Downloads after log in
+
+       Download using Oinkcode (Oinkcode is under Profile -> Oinkcode)
+
+		wget https://www.snort.org/rules/snortrules-snapshot-3000.tar.gz?oinkcode=XXXXXXXX -O registered.tar.gz
+		tar -xvf registered.tar.gz -C /etc/snort
+
+   Enbale ALL (Caution: some rule configurations may error and will need to be fixed)
+
+	cp /etc/snort/snort.conf /etc/snort/snort.conf.backup
+	cd /etc/snort/rules/
+	echo "############## Registerd User Rules ################################" >> /etc/snort/snort.conf
+	for r in `ls snort*.rules`; do echo "include \$RULE_PATH/$r" >> /etc/snort/snort.conf; done
+
+
+Analyzing packet captures:
+-----------------------------
+
+		snort -c /etc/snort/snort.conf -A console -r traffic.pcap
+
+References:
+ * https://upcloud.com/community/tutorials/installing-snort-on-centos/
+ * https://sublimerobots.com/2015/12/the-snort-reputation-preprocessor/
+ * https://www.coresentinel.com/processing-pcap-files-snort/
+
