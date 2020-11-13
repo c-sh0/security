@@ -46,7 +46,6 @@ Basic Configuration
 
 	mkdir /usr/local/lib/snort_dynamicrules
 
-
   Edit snort.conf, Scroll down to the section 6 and set the output for unified2 to
   log under filename of snort.log like below.
 
