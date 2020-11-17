@@ -1,0 +1,82 @@
+PolarProxy
+https://www.netresec.com/?page=PolarProxy
+
+PolarProxy is a transparent SSL/TLS proxy created for incident responders and malware researchers. PolarProxy is primarily designed
+to intercept and decrypt TLS encrypted traffic from malware. PolarProxy decrypts and re-encrypts TLS traffic, while also saving the
+decrypted traffic in a PCAP file that can be loaded into Wireshark or an intrusion detection system (IDS).
+
+Install (CentOS)
+------------------
+* PolarProxy comes as a precompiled binary
+
+	mkdir ~/PolarProxy
+	cd ~/PolarProxy/
+	curl https://www.netresec.com/?download=PolarProxy | tar -xzf -
+
+
+Running PolarProxy
+-------------------
+* No need to generate a SSL cert, PolarProxy will do it for you
+
+	./PolarProxy -v -p 443,80 -x ../polarproxy.cer --certhttp 10080 -w ../polarproxy.pcap
+
+
+    Simple Test (Client):
+	* You need a valid TLD (SNI value) for PolarProxy to process the request
+
+		openssl s_client -servername valid.tld.com -connect <PolarProxyIP>:443
+
+		or (using www.netresec.com for SNI)
+
+		curl --insecure --resolve www.netresec.com:443:<PolarProxyIP> https://www.netresec.com/
+
+
+PolarProxy installed on a separate Server
+------------------------------------------
+
+                {INTERNET}
+                    |
+[WebServer] -> [PolarProxy Server]
+   |
+[Client]
+
+
+    PolarProxy Server:
+    ---------------------
+        - Iptables: (Disable for testing)
+
+	 	systemctl stop iptables.service
+
+	- Bind the proxy to TCP port 10443 instead of 443
+
+		./PolarProxy -v -p 10443,80,443 --certhttp 10080 -w ~/polarproxy.pcap
+
+    Webserver
+    -------------
+	- Enable ip forwarding
+		sysctl -w net.ipv4.ip_forward=1
+
+	- Route https traffic to PolarProxy Server using iptables
+
+		iptables -t nat -A PREROUTING -p tcp --dport 443 -j DNAT --to-destination <PolarProxyIP>:10443
+		iptables -t nat -A POSTROUTING -o <Interface> -d <PolarProxyIP> -p tcp --dport 10443 -j MASQUERADE
+		iptables -I INPUT 1 -m state --state NEW,RELATED,ESTABLISHED -j ACCEPT
+		iptables -I FORWARD 1 -m state --state NEW,RELATED,ESTABLISHED -j ACCEPT
+
+
+    Client Test
+    ---------------
+
+	openssl s_client -servername valid.tld.com -connect <WebserverIP>:443
+
+	or (using www.netresec.com for SNI)
+
+	curl --insecure --resolve www.netresec.com:443:<WebserverIP> https://www.netresec.com/
+
+
+References:
+* https://www.netresec.com/?page=PolarProxy
+* https://www.netresec.com/?page=Blog&month=2020-03&post=Reverse-Proxy-and-TLS-Termination
+
+
+

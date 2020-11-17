@@ -1,0 +1,45 @@
+Suricata
+---------------------
+https://suricata-ids.org/
+
+Suricata is a free and open source, mature, fast and robust network threat detection engine.
+The Suricata engine is capable of real time intrusion detection (IDS), inline intrusion prevention (IPS), network security monitoring (NSM) and offline pcap processing.
+
+Install (CentOS)
+-----------------
+
+	yum -y install gcc libpcap-devel pcre-devel libyaml-devel file-devel \
+  		zlib-devel jansson-devel nss-devel libcap-ng-devel libnet-devel tar make \
+  		libnetfilter_queue-devel lua-devel PyYAML libmaxminddb-devel rustc cargo lz4-devel
+
+	mkdir suricata && cd suricata
+	wget https://www.openinfosecfoundation.org/download/suricata-5.0.0.tar.gz
+	tar -zxvf suricata-5.0.0.tar.gz
+	cd
+	./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var --enable-nfqueue --enable-lua
+	make
+	make install-full
+	cp rules/* /etc/suricata/rules/
+	ldconfig
+
+Rules
+--------------
+	wget https://rules.emergingthreats.net/open/suricata-4.0/emerging.rules.tar.gz
+	tar -zxvf emerging.rules.tar.gz
+	cp rules/* /etc/suricata/rules/
+
+   - Additional rules can be found here:
+	https://rules.emergingthreats.net/open/
+
+Scan pcap
+-----------
+
+	suricata -c /etc/suricata/suricata.yaml -r /root/traffic.pcap
+
+
+Reference
+-------------
+* https://redmine.openinfosecfoundation.org/projects/suricata/wiki/CentOS_Installation
+* https://401trg.com/using-emergingthreats-suricata-ruleset-to-scan-pcap/
+* https://www.openinfosecfoundation.org/download/
+
