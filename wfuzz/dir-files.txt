@@ -4355,6 +4355,9 @@ de_AT
 DEBIAN
 debug
 debug/
+debug/requests
+debug/vars
+debug/pprof/goroutine?debug=2
 debugBar
 _debugbar/open
 debug_blocks
