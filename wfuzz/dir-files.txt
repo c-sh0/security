@@ -1677,6 +1677,7 @@ api/users
 api/users/1
 api/v1
 api/v1/
+api/v1.0/status
 api/v1/apidocs
 api/v1/api-docs
 api/v1/login
@@ -14186,6 +14187,7 @@ uddi/uddilistener
 UDP
 ui
 ui/
+ui/setting
 UIControls
 ui.go
 UITests
@@ -14476,6 +14478,14 @@ v1/public/yql
 v1/test/js/console_ajax.js
 v1/test/js/console.html
 v1/node/manifests/latest
+v1/agent/self
+v1/agent/check/register
+v1/catalog/nodes
+v1/catalog/datacenters
+v1/kv
+v1/kv/
+v1/status
+v1/status/leader
 v2
 v2/
 v2/_catalog
