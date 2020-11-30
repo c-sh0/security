@@ -2953,6 +2953,7 @@ cgi-bin/htimage.exe?2,2
 cgi-bin/htmlscript
 cgi-bin/imagemap.exe?2,2
 cgi-bin/index.html
+cgi-bin/kerbynet
 cgi-bin/login
 cgi-bin/login.cgi
 cgi-bin/logi.php
@@ -9243,6 +9244,11 @@ night
 nihilo
 nimcache/
 nimda/
+nifi-api
+nifi-api/access/config
+nifi-api/processors/
+nifi-api/process-groups/
+nifi-api/process-groups/root
 Ninject
 Nirvanix
 nitobi
