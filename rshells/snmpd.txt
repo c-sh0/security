@@ -29,9 +29,10 @@ Sample /etc/snmp/snmpd.conf:
 Client Test:
 	snmpwalk -v 2c -c rw_community <snmpd.ip.address>
 
-
 Command Set:
-	snmpset -m +NET-SNMP-EXTEND-MIB -v 2c -c all_user <snmpd.ip.address> 'nsExtendStatus."cmd"' = createAndGo 'nsExtendCommand."cmd"' = /usr/bin/id 'nsExtendArgs."cmd"' = '"-a"'
+	snmpset -m +NET-SNMP-EXTEND-MIB -v 2c -c all_user <snmpd.ip.address> \
+		'nsExtendStatus."cmd"' = createAndGo \
+		'nsExtendCommand."cmd"' = /usr/bin/id 'nsExtendArgs."cmd"' = '"-a"'
 
 Command Execute:
 	snmpwalk -v 2c -c rw_community <snmpd.ip.address> nsExtendOutput2
