@@ -1666,6 +1666,10 @@ api/silence/get
 api/silence/set
 apis/metrics
 api/status
+api/v1/status/config
+api/v2/status/config
+api/v3/status/config
+api/v4/status/config
 api/swagger
 api/swagger/
 api/swagger.json
