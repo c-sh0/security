@@ -52,3 +52,10 @@ grafana
 grafana_ro
 grafana_rw
 
+Example admin user token with an expiration date of 9999999/12/31
+
+$ date -d '9999999/12/31' +%s
+315507352716000
+
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwiZXhwIjozMTU1MDczNTI3MTYwMDB9.iny1LZi559E8IiXmKr9sT4Vu4z_iAWKHQniMoySUJNI
+
