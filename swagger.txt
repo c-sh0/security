@@ -3,3 +3,6 @@ Get version (swagger ui)
 
 	curl -v http://<host>:<port>/path/to/swagger-ui.js
 
+Swagger url paramter Risk: 
+https://github.com/swagger-api/swagger-ui/security/advisories/GHSA-qrmm-w75w-3wpx
+
