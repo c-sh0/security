@@ -11,6 +11,9 @@
 # /proc/[pid]/environ
 # This file contains the environment for the process. The entries are separated by null characters, and there may be a null character at the end.
 #
+# NOTES:
+#   - https://github.com/lemonsqueeze/ttylogger
+#
 # [/csh:]>
 #
 if [ "$#" -ne 1 ]; then
